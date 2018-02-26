@@ -1,6 +1,6 @@
-#include <sys/types.h>         
+#include <sys/types.h>
 #include <sys/socket.h>
-#include <sys/types.h>         
+#include <sys/types.h>
 #include <sys/socket.h>
 #include <unistd.h>
 #include <stdio.h>
@@ -27,17 +27,22 @@ addr->sin_port = htons(sinport);
 return 0 ;
 }
 
-void readline(int sock,char buf[])
+void read_data(int sock,char buf[])
 {char c;
-int i=0;
-while(read(sock,&c,1)>0&&i<BUFF_SIZE)
+int i=0,n;
+read(sock,&n,sizeof(int));
+while(read(sock,&c,1)>0&&i<BUFF_SIZE&&i<n)
 {printf("%c",c);
-buf[i++]=c;
-if(c=='\n')
-break;
-}
-buf[i]='\0';
-}
+buf[i++]=c;}
+buf[i]='\0';}
+
+void send_data(int sock,char buf[],int len)
+{char c;
+int i=0,n=len;
+write(sock,&n,sizeof(int));
+while(write(sock,&buf[i++],1)>0&&i<BUFF_SIZE&&i<n);
+buf[i]='\0';}
+
 
 int main(int argv,char *args[])
 {char name[30],line[200];
@@ -45,7 +50,7 @@ int j;
 printf("%s\n",args[1]);
 //fgets(name,30,stdin);
 struct sockaddr_in loc,rem;
-socklen_t rlen;
+socklen_t rlen=sizeof(rem);
 setaddr(&loc,NULL,INADDR_ANY,atoi(args[1]));
 int sockfd, newsockfd;
 printf("Messsages:\n");
@@ -60,18 +65,16 @@ if (listen(sockfd,10) < 0)
 printf("3%s\n",strerror(errno));
 for (;;)
 {newsockfd=accept(sockfd,(struct sockaddr *)&rem,&rlen);/* blocare pentru asteptare cereri*/
- printf("4%s\n",strerror(errno)); 
-if (newsockfd < 0) 
-   printf ("error4 ...\n"); 
+ printf("4%s\n",strerror(errno));
+if (newsockfd < 0)
+   printf ("error4 ...\n");
   else
-  {
-  if(fork()==0)
-  {readline(newsockfd,line); /*deservire cerere*/
-  printf("line: %s",line);
+  {read_data(newsockfd,line);
+  if(fork()==0) /*deservire cerere*/
+  { printf("line: %s",line);
   close (newsockfd);
+  exit(0);}
 if(strcmp(line,"~exit\n")==0)
- {printf("Finish\n");break;exit(0);}
-    
+ {printf("Finish\n");break;}
 }}
-}
 return 0;}
