@@ -15,14 +15,15 @@
 #define BUFF_SIZE 200
 int sockfd;
 
-void read_data(int sock,char buf[])
+int read_data(int sock,char buf[])
 {char c;
-int i=0,n;
-read(sock,&n,sizeof(int));
+int i=0,n,y;
+y=read(sock,&n,sizeof(int));
 printf("n=%d\n",n);
 read(sock,buf,n);
 buf[n]='\0';
-printf("%s\n",buf);}
+printf("%s\n",buf);
+return y;}
 
 void send_data(int sock,char buf[])
 {char c;
@@ -55,9 +56,7 @@ char user[100],pass[100];
 struct sockaddr_in loc,rem;
 char mess[100];
 do{
-if(init==1)
-{//conectare socket
-for(i=0;i<10;i++)
+if(init==1)//conectare socket
 {if ((sockfd=socket(PF_INET,SOCK_STREAM,0)) < 0)
    {printf ("error1 ...\n"); continue;}
 printf("1%s\n",strerror(errno));
@@ -66,18 +65,8 @@ printf("con %d\n",val=connect(sockfd,(struct sockaddr *)&rem,sizeof(rem)));
 printf("2%s\n",strerror(errno));
 if(val<0)
 continue;
-else {//creare proces copil=> primire mesaje
-    if(fork()==0)
-  while(3)
-  {read_data(sockfd,mess);
-   printf("Message: %s",mess);
-   if(strcmp(mess,"~exit\n")==0)
-   {close(sockfd);exit(0);}}}
-   init=0;break;}}
-
-//logare
-/*
-printf("User: ");
+else {init=0;//logare
+/*printf("User: ");
 scanf("%s",user);
 printf("Pass: ");
 scanf("%s",pass);
@@ -86,7 +75,13 @@ send_data(sockfd,pass);
 read_data(sockfd,mess);
 printf("Mess %s|\n",mess);
 init=strcmp(mess,"okay")==0 ? 0 : 1;*/
-   
+    //creare proces copil=> primire mesaje
+    if(fork()==0)
+  while(3)
+  {int y=read_data(sockfd,mess);
+   printf("Message: %s",mess);
+   if(strcmp(mess,"~exit\n")==0||y<=0)
+   {close(sockfd);exit(0);}}}}
 //trimiteremesaj
 fflush(stdin);
 fgets(text,100,stdin);
@@ -94,7 +89,6 @@ send_data(sockfd,text);
 printf("sock %d %s",sockfd,text);
 //iesire client
 if(strcmp(text,"~exit\n")==0)
-{close(sockfd);init=1;}
-}
-while(3||strcmp(text,"~exit\n")!=0);
+{close(sockfd);break;}
+}while(3||strcmp(text,"~exit\n")!=0);
 return 0;}
