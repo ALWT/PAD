@@ -24,15 +24,17 @@ int val_ret,total=0;
 #define BUFF_SIZE 200
 
 int remove_client(int s)
-{struct client *i,*aux;
+{struct client *i,*q,*aux;
 if(rad==NULL)
 return -1;
-for(i=rad;i!=NULL&&i->s!=s;i=i->urm);
+for(i=rad,q=NULL;i!=NULL&&i->s!=s;q=i,i=i->urm);
 printf("freerad1\n");
 if(i!=NULL)
 {total--;
 if(i==rad)
 rad=rad->urm;
+else 
+q->urm=i->urm;
 close(i->s);
 free(i);
 printf("freerad2\n");
