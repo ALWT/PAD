@@ -17,13 +17,13 @@ int sockfd;
 
 int read_data(int sock,char buf[])
 {char c;
-int i=0,n,y;
+int i=0,n,y,z;
 y=read(sock,&n,sizeof(int));
-printf("n=%d\n",n);
-read(sock,buf,n);
+//printf("n=%d\n",n);
+z=read(sock,buf,n);
 buf[n]='\0';
-printf("%s\n",buf);
-return y;}
+//printf("%s\n",buf);
+return y>0&&z>0;}
 
 void send_data(int sock,char buf[])
 {char c;
@@ -66,7 +66,7 @@ printf("2%s\n",strerror(errno));
 if(val<0)
 continue;
 else {init=0;//logare
-/*printf("User: ");
+printf("User: ");
 scanf("%s",user);
 printf("Pass: ");
 scanf("%s",pass);
@@ -74,21 +74,27 @@ send_data(sockfd,user);
 send_data(sockfd,pass);
 read_data(sockfd,mess);
 printf("Mess %s|\n",mess);
-init=strcmp(mess,"okay")==0 ? 0 : 1;*/
+
+if(strcmp(mess,"okay")!=0)
+   {close(sockfd);
+    exit(0);}
+
     //creare proces copil=> primire mesaje
     if(fork()==0)
   while(3)
   {int y=read_data(sockfd,mess);
-   printf("Message: %s",mess);
+   printf("%s",mess);
    if(strcmp(mess,"~exit\n")==0||y<=0)
-   {close(sockfd);exit(0);}}}}
+   {close(sockfd);exit(0);}}
+    } 
+}
 //trimiteremesaj
 fflush(stdin);
 fgets(text,100,stdin);
 send_data(sockfd,text);
-printf("sock %d %s",sockfd,text);
+//printf("sock %d %s",sockfd,text);
 //iesire client
 if(strcmp(text,"~exit\n")==0)
 {close(sockfd);break;}
-}while(3||strcmp(text,"~exit\n")!=0);
+}while(3);
 return 0;}
