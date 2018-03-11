@@ -9,7 +9,7 @@ send password<br>
 if server logins user => "read okay"<br>
 else => read "wrong" client closes<br>
 connection created to server <br>
-send messages: int n = 4 Bytes -> message length + n chars = 4*1 Bytes -> message <br>
+send messages: (int n = 4 Bytes -> message length) + (n chars = n*1 Bytes -> message) <br>
 receive messages<br>
 if message = "~exit" disconnect client from server + client closes<br> 
 
