@@ -11,7 +11,7 @@ else => read "wrong" client closes<br>
 connection created to server <br>
 send messages: int n = 4 Bytes -> message length + n chars = 4*1 Bytes -> message <br>
 receive messages<br>
-if message = ~exit disconnect client from server + server closes<br> 
+if message = "~exit" disconnect client from server + client closes<br> 
 
 <hr>
 <ul>
