@@ -28,7 +28,7 @@ return y>0&&z>0;}
 void send_data(int sock,char buf[])
 {char c;
 int i=0,n=strlen(buf);
-printf("%s %d\n",buf,n);
+//printf("%s %d\n",buf,n);
 write(sock,&n,sizeof(int));
 write(sock,buf,n);}
 
@@ -83,18 +83,19 @@ if(strcmp(mess,"okay")!=0)
     if(fork()==0)
   while(3)
   {int y=read_data(sockfd,mess);
-   printf("%s",mess);
-   if(strcmp(mess,"~exit\n")==0||y<=0)
+   printf("%s\n",mess);
+   if(strcmp(mess,"~exit")==0||y<=0)
    {close(sockfd);exit(0);}}
     } 
 }
 //trimiteremesaj
 fflush(stdin);
 fgets(text,100,stdin);
+text[strlen(text)-1]='\0';
 send_data(sockfd,text);
 //printf("sock %d %s",sockfd,text);
 //iesire client
-if(strcmp(text,"~exit\n")==0)
+if(strcmp(text,"~exit")==0)
 {close(sockfd);break;}
 }while(3);
 return 0;}

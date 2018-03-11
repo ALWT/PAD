@@ -96,11 +96,11 @@ void * thread_start(void *arg)
         strcat(mess,": ");
    read_data(s->s,line);
    strcat(mess,line);
-   if(strcmp(line,"~exit\n")==0)
+   if(strcmp(line,"~exit")==0)
   {printf("Client log out: %s\n",s->user);send_data(s->s,line);remove_client(s->s);break;}
    for(i=rad;i!=NULL;i=i->urm)
    {send_data(i->s,mess);
-   printf("line: %s %d",mess,i->s);}}
+   printf("line: %s %d\n",mess,i->s);}}
    return NULL; 
 }
 
@@ -132,7 +132,7 @@ if (listen(sockfd,10) < 0)
 printf("3%s\n",strerror(errno));
 //server primire cereri
 for (;;)
-{printf("loop1\n");
+{//printf("loop1\n");
 newsockfd=accept(sockfd,(struct sockaddr *)&rem,&rlen);/* blocare pentru asteptare cereri*/
  printf("4%s\n",strerror(errno));
   if (newsockfd < 0)
@@ -150,12 +150,13 @@ newsockfd=accept(sockfd,(struct sockaddr *)&rem,&rlen);/* blocare pentru astepta
    {printf("Null rad\n");rad=p;}
    else {printf("Not Null rad\n");p->urm=rad;rad=p;}
    send_data(newsockfd,"okay");
+   printf("Client login : %s\n",p->user);
    pthread_create(&rad->t,NULL,&thread_start,(void *)p);}
    //user nu exista
    else 
    {send_data(newsockfd,"wrong");
        close(newsockfd);}}
-  printf("loop2\n");
+  //printf("loop2\n");
 }
 
 return 0;}
