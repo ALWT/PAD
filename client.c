@@ -64,7 +64,7 @@ setaddr(&rem,args[1],0,atoi(args[2]));
 printf("con %d\n",val=connect(sockfd,(struct sockaddr *)&rem,sizeof(rem)));
 printf("2%s\n",strerror(errno));
 if(val<0)
-continue;
+break;
 else {init=0;//logare
 printf("User: ");
 scanf("%s",user);

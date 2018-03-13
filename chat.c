@@ -24,6 +24,7 @@ struct data{
 char user[100],pass[100];
 }c[100];
 
+int sockfd, newsockfd;
 int val_ret,total=0,no_log=0;
 
 #define BUFF_SIZE 200
@@ -44,15 +45,16 @@ for(i=0;i<no_log;i++)
 return 0;}
 
 int remove_client(int s)
-{struct client *i,*aux;
+{struct client *i,*q;
 if(rad==NULL)
 return -1;
-for(i=rad;i!=NULL&&i->s!=s;i=i->urm);
+for(i=rad,q=NULL;i!=NULL&&i->s!=s;q=i,i=i->urm);
 //printf("freerad1\n");
 if(i!=NULL)
 {total--;
 if(i==rad)
 rad=rad->urm;
+else q->urm=i->urm;
 close(i->s);
 free(i);
 //printf("freerad2\n");
@@ -105,12 +107,15 @@ void * thread_start(void *arg)
    read_data(s->s,line);
    strcat(mess,line);
    if(strcmp(line,"~exit")==0)
-  {printf("Client log out: %s\n",s->user);send_data(s->s,line);remove_client(s->s);break;}
+  {printf("Client log out: %s\n",s->user);send_data(s->s,line);remove_client(s->s);
+   if(rad==NULL)  printf("NULL rad \n");
+   else printf("NOT NULL rad \n"); break;}
    for(i=rad;i!=NULL;i=i->urm)
    {send_data(i->s,mess);
    printf("line: %s %d\n",mess,i->s);}}
    if(rad==NULL)
-   exit(0);
+   {close(sockfd);
+   exit(0);}
    return NULL; 
 }
 
@@ -128,17 +133,16 @@ printf("%s\n",args[1]);
 struct sockaddr_in loc,rem;
 socklen_t rlen=sizeof(rem);
 setaddr(&loc,NULL,INADDR_ANY,atoi(args[1]));
-int sockfd, newsockfd;
 //creare server
 printf("Messsages:\n");
 if ((sockfd=socket(AF_INET,SOCK_STREAM,0)) < 0)
-   {printf ("error1 ...\n"); /*exit(1);*/}
+   {printf ("error1 ...\n"); exit(1);}
 printf("1%s\n",strerror(errno));
 if ((bind(sockfd,(struct sockaddr *)&loc,sizeof(loc)))<0)
-   {printf ("error2 ...\n"); /*exit(1);*/}
+   {printf ("error2 ...\n"); exit(1);}
 printf("2%s\n",strerror(errno));
 if (listen(sockfd,10) < 0)
-   {printf ("error3 ...\n"); /*exit(1);*/}
+   {printf ("error3 ...\n"); exit(1);}
 printf("3%s\n",strerror(errno));
 //server primire cereri
 for (;;)
