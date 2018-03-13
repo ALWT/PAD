@@ -28,6 +28,14 @@ int val_ret,total=0,no_log=0;
 
 #define BUFF_SIZE 200
 
+
+struct client * find_user(char *user)
+{struct client *i;
+for(i=rad;i!=NULL;i=i->urm)
+if(strcmp(i->user,user)==0)
+break;
+return i;}
+
 int check_user(char *user,char *pass)
 {int i;
 for(i=0;i<no_log;i++)
@@ -101,6 +109,8 @@ void * thread_start(void *arg)
    for(i=rad;i!=NULL;i=i->urm)
    {send_data(i->s,mess);
    printf("line: %s %d\n",mess,i->s);}}
+   if(rad==NULL)
+   exit(0);
    return NULL; 
 }
 
@@ -140,7 +150,7 @@ newsockfd=accept(sockfd,(struct sockaddr *)&rem,&rlen);/* blocare pentru astepta
   else{read_data(newsockfd,user);
       read_data(newsockfd,pass);
     //verif user
-    if(check_user(user,pass))
+    if(check_user(user,pass)&&find_user(user)==NULL)
    {total++;
    p=malloc(sizeof(struct client));
    p->s=newsockfd;
